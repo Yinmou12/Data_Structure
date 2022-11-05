@@ -113,7 +113,7 @@ void PrintSqList(SqList *L);
 #endif 
 
 
-// sequence.c
+// ------------------------------------------ sequence.c ------------------------------------------
 #include "./header/state.h"
 
 // ************** 线性表的顺序表示和实现 **************
@@ -221,5 +221,692 @@ void Print(SqList L)
         num++;
     }
 }
+
+
+// ------------------------------------------ chain.c ------------------------------------------
+#include "./header/state.h"
+
+// ************** 线性表的链式表示和实现 **************
+
+// 初始化
+int InitLinkList(LinkList L)
+{
+    L = (LinkList)malloc(sizeof(LNode));
+    if (L == NULL)
+    {
+        printf("%s\n", strerror(errno));
+        return ERROR;
+    }
+    L->next = NULL;
+    return OK;
+}
+// 判空
+int ChEmpty(LinkList L)
+{
+    if (L->next)
+        return TRUE;
+    else
+        return FALSE;
+}
+// 销毁
+int DestroyCh(LinkList L)
+{
+    LNode *p = L;
+    while (p)
+    {
+        L = L->next;
+        free(p);
+        p = L;
+    }
+    return OK;
+}
+// 清空
+int ClearCh(LinkList L)
+{
+    LNode *p = L->next;
+    LNode *q = p->next;
+    while (p)
+    {
+        free(p);
+        p = q;
+        q = q->next;
+    }
+    L->next = NULL;
+    return OK;
+}
+// 求链表的长度
+int ChLength(LinkList L)
+{
+    LNode *p = L;
+    int length = 0;
+    while (p->next)
+    {
+        length++;
+        p = p->next;
+    }
+    return length;
+}
+// 取值
+int ChGetElem(LinkList L, int i, ElemType *e)
+{
+    LNode *p = L->next;
+    int j = 1;
+    while(p && j < i)
+    {
+        j++;
+        p = p->next;
+    }
+    if(!p || j > i) return ERROR;
+    *e = p->data;
+    return OK;
+}
+// 查找
+int ChLocateElem(LinkList L,ElemType e, LNode *temp)
+{
+    LNode *p = MALLOC(LNode);
+    p = L->next;
+    int j = 1;
+    while (p && p->data != e)
+    {
+        p = p->next;
+        j++;
+    }
+    if(!p) return 0;
+    temp = p;
+    return j;
+    // 时间复杂度 O(n)
+}
+// 在第i个结点前插入值为e的结点
+int ChInsert(LinkList L, int i, ElemType e)
+{
+    int j = 0;
+    LNode *p = L;
+    while(p && j<i-1)
+    {
+        p = p->next;
+        j++;
+    }
+    if(!p) return ERROR;
+    LNode *s = (LNode *)malloc(sizeof(LNode));
+    s->data = e;
+    s->next = p->next;
+    p->next = s;
+    return OK;
+    // 时间复杂度 O(n)
+}
+// 删除第i个结点
+int ChDeleteNode(LinkList L, int i, ElemType *e)
+{
+    LNode *p = L;
+    int j = 0;
+    while(p && j<i-1)
+    {
+        p = p->next;
+        j++;
+    }
+    if(!(p->next) || j>i-1) return ERROR;
+    LNode *s = (LNode *)malloc(sizeof(LNode));
+    s = p->next;
+    *e = s->data;
+    p->next = s->next;
+    free(s);
+    s = NULL;
+    return OK;
+    // 时间复杂度 O(n)
+}
+// 头插法
+void CreateList_H(LinkList L, int n)
+{
+    L->next = NULL;
+    int i = 0;
+    
+    while( i<n )
+    {
+        LNode *p = (LNode *)malloc(sizeof(LNode));
+        scanf("%d", &(p->data));
+        p->next = L->next;
+        L->next = p;
+        i++;
+    }
+    // free(p);
+    // p = NULL;
+    //时间复杂度O(n)
+}
+// 尾插法
+void CreateList_T(LinkList L, int n)
+{
+    L->next = NULL;
+    LNode *tail = (LNode *)malloc(sizeof(LNode));
+    tail = L;
+    int i = 0;
+    while(i < n)
+    {
+        LNode *p = (LNode *)malloc(sizeof(LNode));
+        scanf("%d", &(p->data));
+        p->next = NULL;
+        tail->next = p;
+        tail = p;
+        i++;
+    }
+    // free(tail);
+    // tail = NULL;
+    //时间复杂度O(n)
+}
+
+void PrintC(LinkList L)
+{
+    LNode *p = (LNode *)malloc(sizeof(LNode));
+    if(!p)
+    {
+        printf("%s\n",strerror(errno));
+    }
+    p = L->next;
+    int num = 0;
+    while(p)
+    {
+        if(num==5)
+        {
+            printf("\n");
+            num = 0;
+        } 
+        printf("%d ",p->data);
+        p = p->next;
+        num++;
+    }
+    free(p);
+    p = NULL;
+    printf("\n");
+}
+
+
+
+// ************** 循环链表 **************
+// 带尾指针的循环链表的合并
+LinkList Connect(LinkList Ta,LinkList Tb)
+{
+    LNode *p = MALLOC(LNode);
+    p = Ta->next;
+    Ta->next = Tb->next->next;
+    free(Tb->next);
+    Tb->next = p;
+    return Tb;
+    // O(1)
+}
+
+
+
+
+
+// ************** 双向链表 **************
+// 初始化
+int InitDuLinkList(DuLinkList L)
+{
+    L = (DuLNode *)malloc(sizeof(DuLNode));
+    if(!L)
+    {
+        printf("%s\n",strerror(errno));
+        return ERROR;
+    }
+    // L->next = NULL;
+    // L->prior = NULL;
+    return OK;
+}
+// 判空
+int DuListEmpty(DuLinkList L)
+{
+    if(L->next) return TRUE;
+    else return FALSE;
+}
+// 销毁
+int DestroyDuList(DuLinkList L)
+{
+    DuLNode *p = DUMALLOC(DuLNode);
+    p = L;
+    while(p)
+    {
+        p = p->next;
+        free(L);
+        L = p;
+    }
+    return OK;
+}
+// 清空
+int ClearDuList(DuLinkList L)
+{
+    DuLNode *p = DUMALLOC(DuLNode);
+    DuLNode *q = DUMALLOC(DuLNode);
+    p = L->next;
+    while(p)
+    {
+        q = p->next;
+        free(p);
+        p = q;
+    }
+    return OK;
+}
+// 长度
+int DuListLength(DuLinkList L)
+{
+    DuLNode *p = DUMALLOC(DuLNode);
+    p = L->next;
+    int j = 1;
+    while(p)
+    {
+        p = p->next;
+        j++;
+    }
+    return j;
+}
+// 取值
+int DuListGetElem(DuLinkList L,int i,ElemType *e)
+{
+    DuLNode *p = DUMALLOC(DuLNode);
+    p = L;
+    int j = 0;
+    while(p && j < i)
+    {
+        p = p->next;
+        j++;
+    }
+    if(!p || j > i) return ERROR;
+    *e = p->data;
+    free(p);
+    p = NULL;
+    return OK;
+}
+// 查找
+int DuListLocateElem(DuLinkList L,ElemType e,DuLNode *temp)
+{
+    DuLNode *p = DUMALLOC(DuLNode);
+    p = L;
+    int j = 0;
+    while(p && (p->data != e))
+    {
+        p = p->next;
+        j++;
+    }
+    if(!p) return -1;
+    temp = p;
+    return j;
+}
+// 在第i个结点前插入值为 e 的结点
+int DuListInsert(DuLinkList L,int i,ElemType e)
+{
+    DuLNode *p = DUMALLOC(DuLNode);
+    p = L;
+    int j = 0;
+    while(p && j<i)
+    {
+        p = p->next;
+        j++;
+    }
+    if(!p || j>i) return ERROR;
+    DuLNode *s = DUMALLOC(DuLNode);
+    s->data = e;
+    p->prior->next = s;
+    s->prior = p->prior;
+    s->next = p;
+    p->prior = s;
+    return OK;
+}
+// 删除第i个结点
+int DeleteDuLNode(DuLinkList L,int i,ElemType *e)
+{
+    DuLNode *p = DUMALLOC(DuLNode);
+    p = L;
+    int j = 0;
+    while(p && (j < i))
+    {
+        p = p->next;
+        j++;
+    }
+    if(!p || j > i) return ERROR;
+    *e = p->data;
+    printf("p->prior = %p\n",p->prior);
+    printf("p->next = %p\n",p->next);
+    p->prior->next = p->next;
+    p->next->prior = p->prior;
+    free(p);
+    return OK;
+}
+// 双向链表的建立
+// 尾插法
+void CreateDuList_T(DuLinkList L,int n)
+{
+    DuLNode *p = DUMALLOC(DuLNode);
+    p = L;
+    int i = 0;
+    while (i < n)
+    {
+        DuLNode *s = DUMALLOC(DuLNode);
+        scanf("%d",&(s->data));
+        p->next = s;
+        s->prior = p;
+        s->next = NULL;
+        p = s;
+        i++;
+    }
+}
+
+void PrintDuList(DuLinkList L)
+{
+    DuLNode *p = DUMALLOC(DuLNode);
+    p = L->next;
+    while(p)
+    {
+        printf("%d ", p->data);
+        p = p->next;
+    }
+    printf("\n");
+}
+
+
+
+// ------------------------------------------ application.c ------------------------------------------
+#include "./header/state.h"
+
+// ************** 线性表的合并 **************
+//初始化
+int InitLinear(LList *L)
+{
+    L->count = 0;
+    L->data = (ElemType *)malloc(sizeof(int) * LIST_INIT_SIZE);
+    if(!L->data) return ERROR;
+    return OK;
+}
+// 赋值
+void LinearInsert(LList *L,int n)
+{
+    int i = 0;
+    while(i<n)
+    {
+        scanf("%d", &(L->data[i])); 
+        L->count++;
+        i++;
+    }
+}
+// 合并
+int LinearListConnect(LList *l1,LList *l2,LList *e)
+{
+    int i = 0;
+    while(i < l1->count)
+    {
+        e->data[i] = l1->data[i];
+        e->count++;
+        i++;
+    }
+    int j = 0;
+    while(j < l2->count)
+    {
+        int temp = 0;
+        while(temp < i)
+        {
+            if( l2->data[j] == l1->data[temp] ) 
+                break;
+            temp++;
+        }
+        if(temp >= i)
+        {
+            e->data[temp] = l2->data[j];
+            e->count++;
+            i++;
+        }
+        j++;
+    }
+    return i;
+}
+// 输出
+void PrintLinear(LList *e)
+{
+    int i = 0;
+    while(i < e->count)
+    {
+        printf("%d ", e->data[i]);
+        i++;
+    }
+}
+
+
+
+
+// ************** 有序表的合并 **************
+// 初始化
+int InitSqList(SqList *L)
+{
+    L->count = 0;
+    L->elem = (ElemType *)malloc(sizeof(int) * LIST_INIT_SIZE);
+    if(!L->elem) return ERROR;
+    return OK;
+}
+// 赋值
+int InsertSqList(SqList *L,int n)
+{
+    int i = 0;
+    while(i < n)
+    {
+        scanf("%d",&(L->elem[i]));
+        L->count++;
+        i++;
+    }
+    return OK;
+}
+// 合并
+int ConnectSqList(SqList *L1,SqList *L2,SqList *ret)
+{
+    int i = 0;
+    int j = 0;
+    int loc = 0;
+    while ( i < L1->count && j < L2->count)
+    {
+        // 相同的数只取一个
+        if(L1->elem[i] < L2->elem[j])
+        {
+            ret->elem[loc] = L1->elem[i];
+            i++;
+            loc++;
+        }
+        else if( L2->elem[j] < L1->elem[i] )
+        {
+            ret->elem[loc] = L2->elem[j];
+            j++;
+            loc++;
+        }
+        else
+        {
+            ret->elem[loc] = L1->elem[i];
+            loc++;
+            i++;
+            j++;
+        }
+        // 相同的数都取到
+        // if(L1->elem[i] < L2->elem[j])
+        // {
+        //     ret->elem[loc] = L1->elem[i];
+        //     i++;
+        //     loc++;
+        // }
+        // else
+        // {
+        //     ret->elem[loc] = L2->elem[j];
+        //     j++;
+        //     loc++;
+        // }
+    }
+    if( i == L1->count && j == L2->count )
+    {
+        ret->count = loc;
+        return OK;
+    } 
+
+    if(i == L1->count)
+    {
+        while(j < L2->count)
+        {
+            ret->elem[loc] = L2->elem[j];
+            j++;
+            loc++;
+        }
+    }
+    else if(j == L2->count)
+    {
+        while(i < L1->count)
+        {
+            ret->elem[loc] = L1->elem[i];
+            i++;
+            loc++;
+        }
+    }
+    ret->count = loc;
+    return OK;
+}
+// 输出
+void PrintSqList(SqList *L)
+{
+    int i = 0;
+    while(i < L->count)
+    {
+        printf("%d ",L->elem[i]);
+        i++;
+    }
+}
+
+
+// ------------------------------------------ main.c ------------------------------------------
+#include "./header/state.h"
+
+// ************** 线性表的顺序表示和实现 **************
+// int main()
+// {
+//     SqList L;
+//     SqList(&L);
+//     SqInsert(&L,1,1);
+//     SqInsert(&L,2,2);
+//     SqInsert(&L,3,3);
+//     SqInsert(&L,4,4);
+//     SqInsert(&L,5,5);
+//     SqInsert(&L,6,6);
+//     SqInsert(&L,7,7);
+//     SqInsert(&L,8,8);  
+//     SqInsert(&L,6,10);
+//     int temp = 0;
+//     SqDelete(&L,3,&temp);
+//     Print(L);
+//     printf("\n");
+//     printf("length = %d\n",SqLength(L));
+//     printf("temp = %d\n",temp);
+//     printf("%d所在位置%d\n",3,SqLocateElem(L,3));
+//     printf("%d所在位置%d\n",10,SqLocateElem(L,10));
+//     return 0;
+// }
+
+
+
+
+// ************** 线性表的链式表示和实现 **************
+// int main()
+// {
+//     LinkList L = (LNode *)malloc(sizeof(LNode));
+//     //CreateList_H(L,4);
+//     CreateList_T(L,4);
+//     PrintC(L);
+//     ElemType temp = 0;
+//     ChDeleteNode(L,2,&temp);
+//     printf("temp = %d\n",temp);
+//     ElemType x = 10;
+//     ChInsert(L,3,x);
+//     LNode *t = MALLOC(LNode);
+//     int loc = ChLocateElem(L,3,t);
+//     printf("loc = %d\n",loc);
+//     printf("t->data = %d\n",t->data);
+//     ChGetElem(L,2,&temp);
+//     printf("temp = %d\n",temp);
+//     int len = ChLength(L);
+//     printf("length = %d\n",len);
+//     PrintC(L);
+//     int ret = ChEmpty(L);
+//     printf("%d\n",ret);
+//     DestroyCh(L);
+//     free(t);
+//     t = NULL;
+//     return 0;
+// }
+
+
+// ************** 双向链表 **************
+// int main()
+// {
+//     DuLinkList L = DUMALLOC(DuLNode);
+//     // InitDuLinkList(L);
+//     CreateDuList_T(L,4);
+//     int empty = DuListEmpty(L);
+//     printf("empty = %d\n",empty);
+//     int len = DuListLength(L);
+//     printf("len = %d\n",len);
+//     PrintDuList(L);
+//     printf("empty = %d\n",DuListEmpty(L));
+//     printf("len = %d\n",DuListLength(L));
+//     DuLNode *ret = DUMALLOC(DuLNode);
+//     int loc = DuListLocateElem(L,10,ret);
+//     printf("loc = %d\n",loc);
+//     DuListInsert(L,3,10);
+//     PrintDuList(L);
+//     printf("loc = %d\n",DuListLocateElem(L,10,ret));
+//     ElemType e = 0;
+//     DeleteDuLNode(L,3,&e);
+//     printf("e = %d\n",e);
+//     printf("len = %d\n",DuListLength(L));
+//     PrintDuList(L);
+//     return 0;
+// }
+
+
+
+
+// // ************** 线性表的合并 **************
+// int main()
+// {
+//     LList L1;
+//     LList L2;
+//     InitLinear(&L1);
+//     InitLinear(&L2);
+//     printf("L1:>");
+//     LinearInsert(&L1,3);
+//     printf("L2:>");
+//     LinearInsert(&L2,6);
+//     LList ret;
+//     ret.count = 0;
+//     ret.data = (ElemType *)malloc(sizeof(ElemType) * (L1.count + L2.count));
+//     LinearListConnect(&L1,&L2,&ret);
+//     PrintLinear(&ret);
+//     return 0;
+// }
+// L1={1,7,8}  L2={2,4,6,8,10,11}
+
+
+// ************** 有序表的合并 **************
+int main()
+{
+    SqList L1;
+    SqList L2;
+    SqList ret;
+    ret.elem = (ElemType *)malloc(sizeof(ElemType) * (L1.count + L2.count));   
+    InitSqList(&L1);  
+    InitSqList(&L2);
+    printf("L1:>\n");
+    InsertSqList(&L1,3);
+    printf("L2:>\n");
+    InsertSqList(&L2,6);
+    ConnectSqList(&L1,&L2,&ret);
+    PrintSqList(&ret);
+    return 0;
+}
+// L1={1,7,8}  L2={2,4,6,8,10,11}
+
+
+
+
+
+
+
 
 
