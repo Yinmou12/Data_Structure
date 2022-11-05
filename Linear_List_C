@@ -1,0 +1,225 @@
+#ifndef __STATE_H__
+#define __STATE_H__
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+
+#define LIST_INIT_SIZE 100
+#define TRUE 1
+#define FALSE 0
+#define OVERFLOW -2
+#define INFEASIBLE -1
+#define OK 1
+#define ERROR -1
+#define MALLOC(X) ((X *)malloc(sizeof(X)))
+#define DUMALLOC(X) ((X *)malloc(sizeof(X)))
+
+
+typedef int ElemType;
+// ************** 线性表的顺序表示和实现**************
+typedef struct LinearList{
+    int count;
+    ElemType *elem;
+}SqList,*LinearList;
+
+int InitSq(SqList *L);
+void DestroySq(SqList *L);
+void ClearSq(SqList *L);
+int SqLength(SqList L);
+int SqEmpty(SqList L);
+int SqGetElem(SqList L, int i, ElemType *e);
+int SqLocateElem(SqList L,ElemType e);
+int SqInsert(SqList *L, int i, ElemType e);
+int SqDelete(SqList *L, int i, ElemType *e);
+void Print(SqList L);
+
+
+
+// ************** 线性表的链式表示和实现**************
+typedef struct Node{
+    ElemType data;
+    struct Node *next;
+}LNode,*LinkList;
+
+int InitLinkList(LinkList L);
+int ChEmpty(LinkList L);
+int DestroyCh(LinkList L);
+int ClearCh(LinkList L);
+int ChLength(LinkList L);
+int ChGetElem(LinkList L, int i, ElemType *e);
+int ChLocateElem(LinkList L,ElemType e, LNode *temp);
+int ChInsert(LinkList L, int i, ElemType e);
+int ChDeleteNode(LinkList L, int i, ElemType *e);
+// 单链表的建立
+// 头插法
+void CreateList_H(LinkList L, int n);
+// 尾插法
+void CreateList_T(LinkList L, int n);
+
+void PrintC(LinkList L);
+
+
+
+// ************** 循环链表 **************
+LinkList Connect(LinkList Ta,LinkList Tb);
+
+
+
+
+// ************** 双向链表 **************
+typedef struct DuLNode
+{
+    ElemType data;
+    struct DuLNode *prior,*next;
+}DuLNode,*DuLinkList;
+int InitDuLinkList(DuLinkList L);
+int DuListEmpty(DuLinkList L);
+int DestroyDuList(DuLinkList L);
+int ClearDuList(DuLinkList L);
+int DuListLength(DuLinkList L);
+int DuListGetElem(DuLinkList L,int i,ElemType *e);
+int DuListLocateElem(DuLinkList L,ElemType e,DuLNode *temp);
+int DuListInsert(DuLinkList L,int i,ElemType e);
+int DeleteDuLNode(DuLinkList L,int i,ElemType *e);
+// 双向链表的建立
+// 尾插法
+void CreateDuList_T(DuLinkList L,int n);
+
+void PrintDuList(DuLinkList L);
+
+
+// ************** 线性表的合并 **************
+typedef struct linear
+{
+    ElemType *data;
+    int count;
+}LList;
+int InitLinear(LList *L);
+void LinearInsert(LList *L,int n);
+int LinearListConnect(LList *l1,LList *l2,LList *e);
+void PrintLinear(LList *e);
+
+
+
+// ************** 有序表的合并 **************
+int InitSqList(SqList *L);
+int InsertSqList(SqList *L,int n);
+int ConnectSqList(SqList *L1,SqList *L2,SqList *ret);
+void PrintSqList(SqList *L);
+
+
+#endif 
+
+
+// sequence.c
+#include "./header/state.h"
+
+// ************** 线性表的顺序表示和实现 **************
+//初始化线性表
+int InitSq(SqList *L)
+{
+    L->elem = (int *)malloc(sizeof(ElemType) * LIST_INIT_SIZE);
+    if(L->elem == NULL)
+    {
+        return ERROR;
+    }
+    L->count = 0;
+    return OK;
+}
+//销毁
+void DestroySq(SqList *L)
+{
+    if(L->elem)
+    {
+        free(L->elem);
+        L->elem = NULL;
+    } 
+}
+//清空
+void ClearSq(SqList *L)
+{
+    L->count = 0;
+}
+//获取长度
+int SqLength(SqList L)
+{
+    return L.count;
+}
+//判空
+int SqEmpty(SqList L)
+{
+    if(L.count == 0)
+        return TRUE;
+    else 
+        return FALSE;
+}
+//取值
+int SqGetElem(SqList L, int i, ElemType *e)
+{
+    if( i<0 || i>L.count )
+        return OVERFLOW;
+    *e = L.elem[i-1];
+    return OK;
+}
+//查找与e相同的元素
+int SqLocateElem(SqList L,ElemType e)
+{
+    if(L.count == 0) return OVERFLOW;
+    int i = 0;
+    while (i < L.count && L.elem[i] != e)
+    {
+        i++;
+    }
+    if(i<L.count) return i + 1;
+    else return -1;
+    //时间复杂度O(n)    1/n * ( n*(n+1)/2 )
+}
+//插入
+int SqInsert(SqList *L, int i, ElemType e)
+{
+    if(L->count == LIST_INIT_SIZE  || i < 1 || i > L->count+1)
+        return ERROR;
+    int j = L->count;
+    for(; j > i-1; j--)
+    {
+        L->elem[j] = L->elem[j-1];
+    }
+    L->elem[i-1] = e;
+    L->count++;
+    return OK;
+    //时间复杂度O(n)    1/(n+1) * ( n*(n+1)/2 )
+}   
+//删除
+int SqDelete(SqList *L, int i, ElemType *e){
+    if( i < 1 || i > L->count)
+        return ERROR;
+    *e = L->elem[i-1];
+    int j = i - 1;
+    for(; j < L->count-1 ; j++)
+    {
+        L->elem[j] = L->elem[j+1];
+    }
+    L->count--;
+    return OK;
+    //时间复杂度O(n)    (1/n)*( n*(n-1)/2 )
+}
+//输出
+void Print(SqList L)
+{
+    int i = 0;
+    int num = 0;
+    for(; i < L.count; i++)
+    {
+        // if(num == 5)
+        // {
+        //     num = 0;
+        //     printf("\n");
+        // }
+        printf("%d ",L.elem[i]);
+        num++;
+    }
+}
+
+
