@@ -1,0 +1,72 @@
+#ifndef __STATEMENT_H__
+#define __STATEMENT_H__
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+
+#define STACKSIZE 5
+#define TRUE 1
+#define FALSE 0
+#define OVERFLOW -2
+#define INFEASIBLE -1
+#define OK 1
+#define ERROR -1
+
+// ******************* 栈 *******************
+// 顺序栈
+typedef int SElemType;
+typedef struct SqStack
+{
+    SElemType *base;
+    SElemType *top;
+    int elemCount;
+}SqStack;
+// 初始化栈
+int InitStack(SqStack *S);
+// 销毁栈
+int DestroyStack(SqStack *S);
+// 清空顺序栈
+int ClearStack(SqStack *S);
+// 判断栈是否为空,返回TRUE或FALSE
+int StackEmpty(SqStack *S);
+// 求栈的长度,返回栈的元素个数，即长度
+int StackLength(SqStack *S);
+// 取栈顶元素
+int GetTopElem(SqStack *S,SElemType *e);
+// 入栈(压栈)
+int Push(SqStack *S,SElemType e);
+// 出栈(弹栈)
+int  Pop(SqStack *S,SElemType *e);
+
+
+
+// 链栈
+typedef struct StackNode
+{
+    SElemType data;
+    struct StackNode *next;
+}StackNode,*LinkStack;
+// 初始化
+int InitLinkStack(StackNode **S);
+// 判空
+int LinkStackEmpty(StackNode *S);
+// 入栈
+int PushLinkStack(StackNode **S, SElemType e);
+// 取栈顶元素
+SElemType GetLinkStackTopElem(StackNode *S);
+// 出栈
+int PopLinkStack(StackNode **S,SElemType *e);
+
+
+
+
+
+
+// ******************* 队列 *******************
+
+
+
+
+#endif
