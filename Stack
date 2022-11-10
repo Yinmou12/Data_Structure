@@ -70,3 +70,216 @@ int PopLinkStack(StackNode **S,SElemType *e);
 
 
 #endif
+
+
+
+// ---------------------------------------- stack.c ----------------------------------------
+#include "./header/statement.h"
+
+
+// 顺序栈
+// 初始化
+int InitStack(SqStack *S)
+{
+    S->base = (SElemType *)malloc(sizeof(SElemType) * STACKSIZE);
+    if(!S->base)
+    {
+        printf("%s",strerror(errno));
+        return ERROR;
+    }
+    S->top = S->base;
+    S->elemCount = 0;
+    return OK;
+}
+// 销毁
+int DestroyStack(SqStack *S)
+{
+    if(S->base)
+    {
+        free(S->base);
+        S->elemCount = 0;
+        S->base = NULL;
+        S->top = NULL;
+    }
+    if(!S->base)
+        return OK;
+    else
+        return ERROR;
+}
+// 清空
+int ClearStack(SqStack *S)
+{
+    if(S->base)
+        S->top = S->base;
+    return OK;
+}
+// 判空
+int StackEmpty(SqStack *S)
+{
+    if(S->base == S->top)
+        return TRUE;
+    else 
+        return FALSE;
+}
+// 取长度
+int StackLength(SqStack *S)
+{
+    return (S->top - S->base);
+}
+// 获取栈顶元素
+int GetTopElem(SqStack *S,SElemType *e)
+{
+    if(S->base == S->top)
+    {
+        printf("栈为空!\n");
+        return ERROR;
+    }
+
+    *e = *(S->top - 1);
+    return OK;
+}
+// 压栈
+int Push(SqStack *S,SElemType e)
+{
+    if( (S->top - S->base) == STACKSIZE) 
+    {
+        printf("栈已满!\n");
+        return ERROR;
+    }
+    
+    *S->top++ = e;
+    return OK;
+}
+// 出栈
+int Pop(SqStack *S,SElemType *e)
+{
+    if(S->base == S->top)
+    {
+        printf("栈为空!\n");
+        return ERROR;
+    }
+
+    *e = *(--S->top);
+    return OK;
+}
+
+
+
+// 链栈
+// 初始化
+int InitLinkStack(StackNode **S)
+{
+    *S = NULL;
+    return OK;
+}
+// 判空
+int LinkStackEmpty(StackNode *S)
+{
+    if(S == NULL)
+        return TRUE;
+    else 
+        return FALSE;
+}
+// 入栈
+int PushLinkStack(StackNode **S, SElemType e)
+{
+    StackNode *p = (StackNode *)malloc(sizeof(StackNode));
+    if(!p)
+    {
+        printf("%s\n",strerror(errno));
+        return ERROR;
+    }
+    p->data = e;
+    p->next = *S;
+    *S = p;
+    return OK;
+}
+// 取栈顶元素
+SElemType GetLinkStackTopElem(StackNode *S)
+{
+    if( S != NULL)
+        return S->data;
+}
+// 出栈
+int PopLinkStack(StackNode **S,SElemType *e)
+{
+    if(!*S)
+    {
+        printf("栈为空!\n");
+        return ERROR;
+    }
+    StackNode *p = (StackNode *)malloc(sizeof(StackNode));
+    if(!p)
+    {
+        printf("%s\n",strerror(errno));
+        return ERROR;
+    }
+    *e = (*S)->data;
+    p = *S;
+    *S = (*S)->next;
+    free(p);
+    p = NULL;
+    return OK;
+}
+
+
+
+// ---------------------------------------- application.c ----------------------------------------
+
+// ---------------------------------------- main.c ----------------------------------------
+#include "./header/statement.h"
+
+
+// 顺序栈
+// int main()
+// {
+//     SqStack *S = (SqStack *)malloc(sizeof(SqStack));
+//     InitStack(S);
+//     int empty = 0;
+//     int len = 0;
+//     empty = StackEmpty(S);
+//     len = StackLength(S);
+//     printf("empty = %d  len = %d\n",empty,len);
+//     Push(S,10);
+//     Push(S,20);
+//     Push(S,30);
+//     Push(S,40);
+//     Push(S,50);
+//     SElemType topElem;
+//     GetTopElem(S,&topElem);
+//     printf("topELem = %d\n",topElem);
+//     SElemType ret;
+//     while(Pop(S,&ret) > 0)
+//     {
+//         printf("%d ",ret);
+//     }
+//     return 0;
+// }
+
+
+
+// 链栈
+// int main()
+// {
+//     StackNode *S = (StackNode *)malloc(sizeof(StackNode));
+//     InitLinkStack(&S);
+//     int empty = 0;
+//     empty = LinkStackEmpty(S);
+//     printf("empty = %d\n",empty);
+//     PushLinkStack(&S,10);
+//     PushLinkStack(&S,20);
+//     PushLinkStack(&S,30);
+//     SElemType topElem;
+//     topElem = GetLinkStackTopElem(S);
+//     printf("topElem = %d\n",topElem);
+//     PushLinkStack(&S,40);
+//     PushLinkStack(&S,50);
+//     empty = LinkStackEmpty(S);
+//     topElem = GetLinkStackTopElem(S);
+//     printf("topElem = %d\n",topElem);
+//     printf("empty = %d\n",empty);
+//     SElemType ret;
+//     while(PopLinkStack(&S,&ret) > 0)
+//         printf("%d\n",ret);
+//     return 0;
+// }
