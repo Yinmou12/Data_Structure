@@ -103,12 +103,41 @@ void PrintLinear(LList *e);
 
 
 
-// ************** 有序表的合并 **************
+// ************** 有序表的合并 -- 用顺序表实现 **************
 int InitSqList(SqList *L);
 int InsertSqList(SqList *L,int n);
-int ConnectSqList(SqList *L1,SqList *L2,SqList *ret);
+void ConnectSqList(SqList *L1,SqList *L2,SqList *ret);
 void PrintSqList(SqList *L);
 
+
+
+// ************** 有序表的合并 -- 用链表实现 **************
+int InitChainList(LNode *L);
+int InsertChainList_H(LNode *L, int n);
+int InsertChainList_T(LNode *L, int n);
+LNode *ConnectChainList(LNode *L1,LNode *L2);
+void PrintChainList(LNode *L);
+
+
+
+// ************** 实现一元多项式的运算 **************
+int InitPolynomial(SqList *L);
+int InsertPolynomial(SqList *L,int n);
+int Caculate(SqList *La,SqList *Lb,SqList *Lc);
+void PrintPolynomial(SqList *L);
+
+
+
+// ************** 实现稀疏多项式的运算 **************
+typedef struct Polynomial{
+    int coef;
+    int expn;
+    struct Polynomial *next;
+}Polynomial,PNode;
+int InitSpPolynomial(Polynomial *P);
+int InsertSpPolynomial(Polynomial *P,int n);
+Polynomial *CaculateSpPoly(Polynomial *pa, Polynomial *pb);
+void PrintSpPoly(Polynomial *P);
 
 #endif 
 
