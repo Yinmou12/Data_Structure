@@ -478,3 +478,14 @@ void TestMideToLast()
     cout << endl;
 }
 
+// ------------------------- Main.cpp -------------------------
+#include "./header/Stack.h"
+
+// 链栈
+int main()
+{
+    // TestLinkStack();
+    // TestMatchBracket();
+    TestMideToLast();
+    return 0;
+}
