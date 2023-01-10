@@ -438,7 +438,7 @@ char *MidToLast(char source[], int source_len)
                     GetTopElem(S, temp); // 查看栈顶元素
                 else
                     temp = 0;
-                while (temp != '(' || !StackEmpty(S))
+                while (temp != '(' && !StackEmpty(S))
                 {
                     // 依次弹出运算符优先级高于当前运算符的
                     if (temp == '*' || temp == '/')
@@ -466,6 +466,7 @@ char *MidToLast(char source[], int source_len)
 void TestMideToLast()
 {
     char source[] = "A+B*(C-D)-E/F";
+    char source2[] = "(D/(A-(B+C)))*E-(F+(G-H))";
     int length = strlen(source);
     char *dest = (char *)malloc(sizeof(char) * length);
     dest = MidToLast(source, length);
