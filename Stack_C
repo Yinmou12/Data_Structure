@@ -1,3 +1,4 @@
+// --------------------- Stack.h ---------------------
 #ifndef __STACK_H__
 #define __STACK_H__
 
@@ -79,3 +80,252 @@ void TestMideToLast();
 int Caculate();
 
 #endif
+
+// --------------------- Stack.cpp ---------------------
+#include "./header/Stack.h"
+
+// --------------- 顺序栈 ---------------
+// 初始化栈
+void InitSqStack(SqStack &S)
+{
+    S.top = -1;
+    // S.top = 0; 表明top指向下一个可以插入的位置
+}
+
+// 判断栈空
+bool StackEmpty(SqStack S)
+{
+    if (S.top == -1) // 栈空
+        return true;
+    else // 非空
+        return false;
+}
+
+// 入栈
+bool Push(SqStack &S, ElemType e)
+{
+    if (S.top + 1 == MAXSIZE) // 栈满
+        return false;
+    // S.top++;           // 指针+1
+    // S.data[S.top] = e; // 新元素入栈
+    S.data[++S.top] = e; // 先让指针+1,再进行新元素入栈
+    return true;
+}
+
+// 出栈
+bool Pop(SqStack &S, ElemType &e)
+{
+    if (S.top == -1) // 栈空
+        return false;
+    // e = S.data[S.top]; // 栈顶元素先出栈
+    // S.top--;           // 指针在-1
+    e = S.data[S.top--];
+    return true;
+}
+
+// 读取栈顶元素
+bool GetTopElem(SqStack S, ElemType &e)
+{
+    if (S.top == -1)
+        return false;
+    e = S.data[S.top]; // 不需要移动栈顶指针
+    return true;
+}
+
+// --------------- 共享栈 ---------------
+// 初始化栈
+void InitShStack(ShStack &S)
+{
+    // 初始化栈顶指针
+    S.top0 = -1;
+    S.top1 = MAXSIZE;
+    // 栈满条件 : top0 + 1 == top1
+}
+
+// 判断栈空
+bool ShStackEmpty(ShStack S)
+{
+    if (S.top0 == -1 && S.top1 == MAXSIZE)
+        return true;
+    else
+        return false;
+}
+
+// 入栈
+bool ShStackPush(ShStack &S, ElemType e)
+{
+    int select = 0;
+    cout << "选择插入元素的栈(0 或 1)" << endl;
+    cin >> select;
+    if (select == 0)
+    {
+        if (S.top0 + 1 == S.top1)
+        {
+            cout << "栈已满" << endl;
+            return false;
+        }
+        S.data[++S.top0] = e;
+        return true;
+    }
+    else if (select == 1)
+    {
+        if (S.top1 - 1 == S.top0)
+        {
+            cout << "栈已满" << endl;
+            return false;
+        }
+        S.data[--S.top1] = e;
+        return true;
+    }
+    else
+        return false;
+}
+
+// 出栈
+bool ShStackPop(ShStack &S, ElemType &e)
+{
+    int select = 0;
+    cout << "选择出栈元素的栈(0 或 1)" << endl;
+    cin >> select;
+    if (select == 0)
+    {
+        if (S.top0 == -1)
+        {
+            cout << "该栈为空" << endl;
+            return false;
+        }
+        e = S.data[S.top0--];
+        return true;
+    }
+    else if (select == 1)
+    {
+        if (S.top1 == MAXSIZE)
+        {
+            cout << "该栈为空" << endl;
+            return false;
+        }
+        e = S.data[S.top1++];
+        return true;
+    }
+    else
+        return false;
+}
+
+// 读取栈顶元素
+bool ShStackGetTop(ShStack S, ElemType &e)
+{
+    int select = 0;
+    cout << "选择要读取的栈(0 或 1)" << endl;
+    cin >> select;
+    if (select == 0)
+    {
+        if (S.top0 == -1)
+        {
+            cout << "该栈为空" << endl;
+            return false;
+        }
+        e = S.data[S.top0];
+        return true;
+    }
+    else if (select == 1)
+    {
+        if (S.top1 == MAXSIZE)
+        {
+            cout << "该栈为空" << endl;
+            return false;
+        }
+        e = S.data[S.top1];
+        return true;
+    }
+    else
+        return false;
+}
+
+// --------------- 链栈 ---------------
+// 初始化栈
+bool InitLinkStack(LinkStack &S)
+{
+    S = new StackNode;
+    S = NULL;
+    return true;
+}
+
+// 判断栈空
+bool LinkStackEmpty(LinkStack S)
+{
+    if (S == NULL)
+        return true;
+    else
+        return false;
+}
+
+// 入栈
+bool LinkStackPush(LinkStack &S, ElemType e)
+{
+    StackNode *p = new StackNode;
+    p->data = e;
+    p->next = S;
+    S = p;
+    return true;
+}
+
+// 出栈
+bool LinkStackPop(LinkStack &S, ElemType &e)
+{
+    if (S == NULL)
+        return false;
+    StackNode *p = new StackNode;
+    p = S;
+    e = p->data;
+    S = S->next;
+    p->next = NULL;
+    delete p;
+    return true;
+}
+
+// 读取栈顶元素
+bool LinkStackGetTop(LinkStack S, ElemType &e)
+{
+    if (S == NULL)
+        return false;
+    e = S->data;
+    return true;
+}
+
+// 打印
+bool PrintLinkStack(LinkStack S)
+{
+    if (S == NULL)
+        return false;
+    StackNode *p = new StackNode;
+    p = S;
+    while (p)
+    {
+        cout << p->data << " ";
+        p = p->next;
+    }
+    cout << endl;
+    return true;
+}
+
+// Test
+void TestLinkStack()
+{
+    LinkStack S;
+    InitLinkStack(S);
+    cout << LinkStackEmpty(S) << endl;
+    LinkStackPush(S, 'e');
+    LinkStackPush(S, 'd');
+    LinkStackPush(S, 'c');
+    LinkStackPush(S, 'b');
+    PrintLinkStack(S);
+    cout << LinkStackEmpty(S) << endl;
+    ElemType e;
+    LinkStackPop(S, e);
+    cout << "出栈元素 e = " << e << endl;
+    PrintLinkStack(S);
+    LinkStackGetTop(S, e);
+    cout << "栈顶元素 e = " << e << endl;
+}
+
+
