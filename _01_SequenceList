@@ -1,0 +1,191 @@
+// ---------------------------- SqList.h ----------------------------
+#ifndef __SQLIST_H__
+#define __SQLIST_H__
+
+#include <stdio.h>
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
+
+// 顺序表的实现 -- 静态分配
+#define MaxSize 10
+typedef int ElemType;
+typedef struct
+{
+    ElemType data[MaxSize];
+    int length;
+} SqList;
+
+// 初始化顺序表 -- 静态分配
+void InitList(SqList &L);
+// 顺序表的插入
+int InsertList(SqList &L, int i, ElemType e);
+// 顺序表的删除
+int DeleteList(SqList &L, int i, ElemType &e);
+// 顺序表的查找 -- 按位查找
+ElemType GetElem(SqList L, int i);
+// 顺序表的查找 -- 按值查找
+int LocateElem(SqList L, ElemType e);
+
+// 顺序表的实现 -- 动态分配
+#define InitSize 10
+typedef struct
+{
+    ElemType *data;
+    int MAXSize; // 顺序表的最大容量
+    int length;  // 顺序表的当前长度
+} SeqList;
+
+// 初始化顺序表 -- 动态分配
+void InitSeqList(SeqList &L);
+// 增大顺序表的容量
+void IncreaseSize(SeqList &L, int len);
+
+void PrintList(SqList L);
+
+#endif
+
+// ---------------------------- SqList.cpp ----------------------------
+#include "./header/SqList.h"
+
+using namespace std;
+
+// 初始化顺序表 -- 静态分配
+void InitList(SqList &L)
+{
+    int i = 0;
+    for (i = 0; i < MaxSize; i++)
+        L.data[i] = 0;
+    L.length = 0;
+}
+
+// 顺序表的插入
+int InsertList(SqList &L, int i, ElemType e)
+{
+    if (i < 1 || i > L.length + 1)
+    {
+        printf("i的值不合法\n");
+        return 0;
+    }
+    if (L.length == MaxSize)
+    {
+        printf("顺序表已满,插入失败\n");
+        return 0;
+    }
+    for (int j = L.length; j >= i; j--) // 将第i个元素及之后的元素后移
+    {
+        L.data[j] = L.data[j - 1];
+    }
+    L.data[i - 1] = e; // 在第i个位置放入e
+    L.length++;        // 长度+1
+    return 1;
+}
+
+// 顺序表的删除
+int DeleteList(SqList &L, int i, ElemType &e)
+{
+    if (i < 0 || i > L.length)
+    {
+        printf("i的值不合法\n");
+        return 0;
+    }
+    if (L.length == 0)
+    {
+        printf("顺序表已空\n");
+        return 0;
+    }
+    e = L.data[i - 1];
+    for (int j = i; j < L.length; j++)
+    {
+        L.data[j - 1] = L.data[j];
+    }
+    L.length--;
+    return 1;
+}
+
+// 顺序表的查找 -- 按位查找
+ElemType GetElem(SqList L, int i)
+{
+    if (i < 1 || i > L.length)
+        printf("i的值不合法\n");
+    return L.data[i - 1];
+}
+
+// 顺序表的查找 -- 按值查找
+int LocateElem(SqList L, ElemType e)
+{
+    int i = 0;
+    for (i = 0; i < L.length; i++)
+    {
+        if (L.data[i] == e)
+        {
+            cout << "要查找的元素" << e << "所在的位置为:>" << i + 1 << endl;
+            return i + 1;
+        }
+    }
+    printf("未找到该元素\n");
+    return 0;
+}
+
+// 初始化顺序表 -- 动态分配
+void InitSeqList(SeqList &L)
+{
+    L.data = (ElemType *)malloc(sizeof(ElemType) * InitSize);
+    L.length = 0;
+    L.MAXSize = InitSize;
+}
+
+// 增大顺序表的容量
+void IncreaseSize(SeqList &L, int len)
+{
+    // realloc(L.data, (L.MAXSize + len) * sizeof(ElemType));
+    ElemType *p = L.data;
+    L.data = (ElemType *)malloc((L.MAXSize + len) * sizeof(ElemType));
+    for (int i = 0; i < L.length; i++)
+    {
+        L.data[i] = p[i]; // 将数据复制到新区域
+    }
+    L.MAXSize += len; // 顺序表最大长度增加len
+    free(p);          // 释放原来的内存空间
+}
+
+void PrintList(SqList L)
+{
+    int i = 0;
+    for (i = 0; i < L.length; i++)
+    {
+        printf("%d ", L.data[i]);
+        if (i == L.length - 1)
+        {
+            printf("\tL.length = %d\n", L.length);
+        }
+    }
+}
+// ---------------------------- Main.cpp ----------------------------
+#include "./header/LinkList.h"
+
+using namespace std;
+
+// 顺序表
+// int main()
+// {
+//     SqList L;
+//     InitList(L);
+//     InsertList(L, 1, 1);
+//     InsertList(L, 2, 2);
+//     InsertList(L, 3, 4);
+//     InsertList(L, 4, 5);
+//     InsertList(L, 5, 6);
+//     PrintList(L);
+//     InsertList(L, 3, 3);
+//     PrintList(L);
+//     ElemType e;
+//     DeleteList(L, 4, e);
+//     cout << "e = " << e << endl;
+//     PrintList(L);
+//     cout << GetElem(L, 3) << endl;
+//     LocateElem(L, 4);
+//     return 0;
+// }
+
+
