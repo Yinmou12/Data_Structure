@@ -1,0 +1,228 @@
+// ---------------------------- Queue.h ----------------------------
+#ifndef __QUEUE_H__
+#define __QUEUE_H__
+
+#include <iostream>
+#include <string.h>
+
+using namespace std;
+
+// ---------------- 队列的顺序实现 ----------------
+#define MAXSIZE 10
+typedef int ElemType;
+typedef struct QNode
+{
+    ElemType data[MAXSIZE]; // 用静态数组存放队列元素
+    int front, rear;        // 队头指针和队尾指针
+} SqQueue;
+
+// 初始化
+bool InitSqQueue(SqQueue &Q);
+// 判断队列是否为空
+bool SqQueueEmpty(SqQueue Q);
+// 入队
+bool EnSqQueue(SqQueue &Q, ElemType e);
+// 出队
+bool QuitSqQueue(SqQueue &Q, ElemType &e);
+// 获取队头元素
+bool GetSqQueueHead(SqQueue Q, ElemType &e);
+
+// ---------------- 队列的链式实现 ----------------
+// 带头结点
+typedef struct LinkQNode // 链式队列结点
+{
+    ElemType data;
+    struct LinkQNode *next;
+} LinkQNode;
+
+typedef struct LinkQueue // 链式队列
+{
+    LinkQNode *front, *rear; // 队列的队头和队尾指针
+} LinkQueue;
+
+// 初始化
+bool InitLInkQueue(LinkQueue &Q);
+// 判断链式队列是否为空
+bool LinkQueueEmpty(LinkQueue Q);
+// 入队
+bool EnLinkQueue(LinkQueue &Q, ElemType e);
+// 出队
+bool QuitLinkQueue(LinkQueue &Q, ElemType &e);
+// 获取队头元素
+bool GetLinkQueueHead(LinkQueue Q, ElemType &e);
+// 链式队列长度
+int GetLinkQueueLength(LinkQueue Q);
+// TestLinkQueue
+void TestLinkQueue();
+
+#endif
+
+// ---------------------------- Queue.cpp ----------------------------
+#include "./header/Queue.h"
+
+// ---------------- 队列的顺序实现 ----------------
+// 初始化
+bool InitSeqQueue(SqQueue &Q)
+{
+    memset(Q.data, 0, sizeof(ElemType) * MAXSIZE);
+    // 队头、队尾指针 指向0
+    Q.front = 0;
+    Q.rear = 0;
+    return true;
+}
+
+// 判断队列是否为空
+bool SqQueueEmpty(SqQueue Q)
+{
+    if (Q.front == Q.rear)
+        return true;
+    return false;
+}
+
+// 入队
+bool EnSqQueue(SqQueue &Q, ElemType e)
+{
+    if ((Q.rear + 1) % MAXSIZE == Q.front)
+        return false;                // 队满报错
+    Q.data[Q.rear] = e;              // 将 e 插入队尾
+    Q.rear = (Q.rear + 1) % MAXSIZE; // 队尾指针后移
+    return true;
+}
+
+// 出队
+bool QuitSqQueue(SqQueue &Q, ElemType &e)
+{
+    if (Q.front == Q.rear)
+        return false;                  // 队空报错
+    e = Q.data[Q.front];               // 队头元素出队
+    Q.front = (Q.front + 1) % MAXSIZE; // 队头指针后移
+    return true;
+}
+
+// 获取队头元素
+bool GetSqQueueHead(SqQueue Q, ElemType &e)
+{
+    if (Q.rear == Q.front)
+        return false; // 队空报错
+    e = Q.data[Q.front];
+    return true;
+}
+
+// ---------------- 队列的链式实现 ----------------
+// 初始化
+bool InitLInkQueue(LinkQueue &Q)
+{
+    // 带头结点
+    Q.front = new LinkQNode;
+    Q.rear = new LinkQNode;
+    Q.front->next = NULL;
+    Q.rear = Q.front;
+    // 不带头结点
+    // Q.front = NULL;
+    // Q.rear = NULL;
+    return true;
+}
+
+// 判断链式队列是否为空
+bool LinkQueueEmpty(LinkQueue Q)
+{
+    if (Q.rear == Q.front)
+        return true;
+    return false;
+}
+
+// 入队
+bool EnLinkQueue(LinkQueue &Q, ElemType e)
+{
+    LinkQNode *p = new LinkQNode;
+    p->data = e;
+    p->next = NULL;
+    Q.rear->next = p;
+    Q.rear = p;
+    return true;
+}
+
+// 出队
+bool QuitLinkQueue(LinkQueue &Q, ElemType &e)
+{
+    if (Q.front == Q.rear)
+        return false;
+    LinkQNode *p = new LinkQNode;
+    // 带头结点
+    p = Q.front->next;
+    e = p->data;
+    Q.front->next = p->next;
+    p->next = NULL;
+    // 不带头结点
+    // p = Q.front;
+    // e = p->data;
+    // Q.front = Q.front->next;
+    // p->next = NULL;
+    if (Q.rear == p) // 若队列只剩下一个结点，删除后为空
+        Q.rear = Q.front;
+    delete p;
+    return true;
+}
+
+// 获取队头元素
+bool GetLinkQueueHead(LinkQueue Q, ElemType &e)
+{
+    if (Q.front == Q.rear)
+        return false;
+    // 带头结点
+    e = Q.front->next->data;
+    // 不带头结点
+    // e = Q.front->data;
+    return true;
+}
+
+// 链式队列长度
+int GetLinkQueueLength(LinkQueue Q)
+{
+    if (Q.front == Q.rear)
+        return 0;
+    // 带头结点
+    LinkQNode *p = Q.front;
+    int count = 0;
+    while (p = p->next)
+    {
+        count++;
+    }
+    return count;
+    // 不带头结点
+    // LinkQNode *q = Q.front;
+    // int i = 1;
+    // while (q)
+    // {
+    //     q = q->next;
+    //     i++;
+    // }
+    // return i;
+}
+
+// TestLinkQueue
+void TestLinkQueue()
+{
+    LinkQueue Q;
+    InitLInkQueue(Q);
+    cout << LinkQueueEmpty(Q) << endl;
+    EnLinkQueue(Q,10);
+    EnLinkQueue(Q,20);
+    EnLinkQueue(Q,40);
+    EnLinkQueue(Q,50);
+    cout << LinkQueueEmpty(Q) << endl;
+    cout << GetLinkQueueLength(Q) << endl;
+    ElemType e;
+    QuitLinkQueue(Q,e);
+    cout << e << endl;
+    cout << GetLinkQueueLength(Q) << endl;
+}
+
+// ---------------------------- Main.cpp ----------------------------
+#include "./header/Queue.h"
+
+int main()
+{
+    TestLinkQueue();
+    return 0;
+}
