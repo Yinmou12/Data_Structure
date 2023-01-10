@@ -463,14 +463,15 @@ char *MidToLast(char source[], int source_len)
     return dest;
 }
 
-void TestMideToLast()
+void TestMidToLast()
 {
-    char source[] = "A+B*(C-D)-E/F";
-    char source2[] = "(D/(A-(B+C)))*E-(F+(G-H))";
+    // char source[] = "A+B*(C-D)-E/F";
+    char source[] = "(D/(A-(B+C)))*E-(F+(G-H))";
     int length = strlen(source);
     char *dest = (char *)malloc(sizeof(char) * length);
     dest = MidToLast(source, length);
     int i = 0;
+    cout << "dest:>";
     while (i < strlen(dest))
     {
         cout << dest[i];
