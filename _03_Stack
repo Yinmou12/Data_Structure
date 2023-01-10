@@ -75,7 +75,7 @@ void TestMatchBracket();
 
 // --------------- 表达式求值问题 --------------- 
 // 中缀表达式转后缀表达式
-char *MidToLast(char source[], int source_len);
+char *MidToLast(char source[], int source_len, int &dest_length);
 void TestMideToLast();
 int Caculate();
 
@@ -372,7 +372,7 @@ void TestMatchBracket()
 }
 
 // 中缀表达式转后缀表达式
-char *MidToLast(char source[], int source_len)
+char *MidToLast(char source[], int source_len, int &dest_length)
 {
     char *dest = (char *)malloc(sizeof(char) * source_len); // 最终后缀表达式
     int loc = 0;
@@ -469,15 +469,24 @@ void TestMidToLast()
     char source[] = "(D/(A-(B+C)))*E-(F+(G-H))";
     int length = strlen(source);
     char *dest = (char *)malloc(sizeof(char) * length);
-    dest = MidToLast(source, length);
+    int dest_length;
+    dest = MidToLast(source, length, dest_length);
     int i = 0;
     cout << "dest:>";
-    while (i < strlen(dest))
+    while (i < dest_length)
     {
+        //调试过程中,中间步骤使用的是cout输出
+        //从而无法在正确判断程序运行到哪里来了.导致调试block.
+        //std::cout << 空指针时,后续的输出被关闭
         cout << dest[i];
+        // printf("%c",dest[i]);
+        if (i == strlen(dest - 1))
+            cout << endl;
         i++;
     }
-    cout << endl;
+    printf("\n");
+    cout << "cout:>The test passed" << endl;
+    printf("printf:>The test passed\n");
 }
 
 // ------------------------- Main.cpp -------------------------
