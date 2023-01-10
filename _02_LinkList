@@ -1,0 +1,684 @@
+// ---------------------------- LinkList.h ----------------------------
+#ifndef __LINKLIST_H__
+#define __LINKLIST_H__
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <string.h>
+
+using namespace std;
+
+// ----------------------- 单链表 -----------------------
+typedef int ElemType;
+typedef struct LNode
+{
+    ElemType data;
+    struct LNode *next;
+} LNode, *LinkList;
+
+// 初始化一个空的单链表
+bool InitList(LinkList &L);
+// 判断单链表是否为空
+bool Empty(LinkList L);
+// 插入(带头结点)
+bool ListInsert(LinkList &L, int i, ElemType e);
+// 后插操作 -- 在给定的结点之后插入新的结点
+bool InsertNextLNode(LNode *p, ElemType e);
+// 前插操作 -- 在给定的结点之前插入新的结点
+bool InsertPriorLNode(LNode *p, ElemType e);
+// 删除
+bool LNodeDelete(LinkList &L, int i, ElemType &e);
+// 删除指定结点p
+bool DeleteNode(LNode *p);
+// 查找 -- 按位查找
+LNode *GetELem(LinkList L, int i);
+// 查找 -- 按值查找
+LNode *LocateELem(LinkList L, ElemType e);
+// 求表的长度
+int Length(LinkList L);
+// 单链表的建立 -- 尾插法
+LinkList List_TailInsert(LinkList &L);
+// 单链表的建立 -- 头插法 -- 重要应用！！！链表的逆置
+LinkList List_HeadInsert(LinkList &L);
+// 逆置单链表 -- 通过头插法逆置
+LinkList ReverseList(LinkList L);
+// 逆置单链表 -- 原地逆序
+LinkList ReverseList_self(LinkList &L);
+
+// 打印
+void PrintInfo(LinkList L);
+
+// ----------------------- 双链表 -----------------------
+typedef struct DNode
+{
+    ElemType data;
+    struct DNode *prior, *next;
+} DNode, *DLinkList;
+
+// 初始化一个双链表
+bool InitDLinkList(DLinkList &L);
+// 在某个结点之后插入新的结点 -- 后插
+bool InsertNextDNode(DNode *p, DNode *s);
+// 在某个结点之前插入新的结点 -- 前插
+bool InsertPriorDNode(DNode *p, DNode *s);
+// 删除 p 结点的后继结点
+bool DeleteDNode(DLinkList &L, DNode *p, ElemType &e);
+// 打印
+bool PrintDLinkList(DLinkList L);
+
+// ----------------------- 循环链表 -----------------------
+// 初始化一个空的循环单链表
+bool InitCircularList(LinkList &L);
+// 判断循环单链表是否为空
+bool EmptyCircularList(LinkList L);
+// 初始化一个空的循环双链表
+bool InitCircularDList(DLinkList &L);
+// 判断循环双链表是否为空
+bool EmptyCircularDList(DLinkList L);
+// 循环双链表的插入
+bool InsertCircularDList(DNode *p, DNode *s);
+// 循环双链表的删除
+bool DeleteCircularDList(DLinkList &L, DNode *p);
+
+// ----------------------- 静态链表 -----------------------
+// 适用场景:
+//1、不支持指针的低级语言
+//2、数据元素数量固定不变的场景(如操作系统的文件分配表FAT)
+#define MaxSize 10 // 静态链表的最大长度
+typedef struct Node
+{
+    ElemType data; // 存储数据元素
+    int next;      // 下一个元素的数组下标
+} SLinkList[MaxSize];
+
+// 初始化静态链表
+bool InitSLinkList(SLinkList &SL);
+// 查找
+bool SearchElem(SLinkList SL, ElemType e);
+// 插入位序为 i 的结点
+bool InsertSLinkList(SLinkList &SL, ElemType e);
+// 删除某个结点
+bool DeleteSNode(SLinkList &SL, ElemType e);
+// 设置链表的值
+bool SetELem(SLinkList &SL, int i, ElemType e, int ptr);
+// 打印
+void PrintSLinkList(SLinkList SL);
+
+#endif
+
+// ---------------------------- LinkList.cpp ----------------------------
+#include "./header/LinkList.h"
+
+using namespace std;
+
+// ----------------------- 单链表 -----------------------
+// 初始化一个空的单链表
+bool InitList(LinkList &L)
+{
+    L = (LinkList)malloc(sizeof(LNode));
+    if (!L)
+        return false;
+    L->next = NULL;
+    return true;
+}
+
+// 判断单链表是否为空
+bool Empty(LinkList L)
+{
+    return (!L->next);
+}
+
+// 插入(带头结点)
+bool ListInsert(LinkList &L, int i, ElemType e)
+{
+    if (i < 1)
+    {
+        printf("i的值不合法\n");
+        return false;
+    }
+    // LNode *p = (LNode *)malloc(sizeof(LNode));
+    // p = L;
+    // int j = 0;
+    // while (p && j < i - 1)
+    // {
+    //     p = p->next;
+    //     j++;
+    // }
+    LNode *p = GetELem(L, i - 1);
+    // if (!p)
+    // {
+    //     printf("i的值不合法\n");
+    //     return false;
+    // }
+    // LNode *s = (LNode *)malloc(sizeof(LNode));
+    // s->data = e;
+    // s->next = p->next;
+    // p->next = s;
+    // return true;
+    return InsertNextLNode(p, e);
+}
+
+// 后插操作 -- 在给定的结点后插入新的结点
+bool InsertNextLNode(LNode *p, ElemType e)
+{
+    if (!p)
+    {
+        return false;
+    }
+    LNode *s = (LNode *)malloc(sizeof(LNode));
+    if (!s)
+    {
+        cout << "内存分配失败" << endl;
+        return false;
+    }
+    s->data = e;
+    s->next = p->next;
+    p->next = s;
+    return true;
+}
+
+// 前插操作 -- 在给定的结点之前插入新的结点
+bool InsertPriorLNode(LNode *p, ElemType e)
+{
+    if (!p)
+    {
+        cout << "该指针为空指针" << endl;
+        return false;
+    }
+    LNode *s = (LNode *)malloc(sizeof(LNode));
+    if (!s)
+    {
+        cout << "内存分配失败" << endl;
+        return false;
+    }
+    s->next = p->next;
+    p->next = s;
+    s->data = p->data;
+    p->data = e;
+    return true;
+}
+
+// 删除
+bool LNodeDelete(LinkList &L, int i, ElemType &e)
+{
+    if (i < 1)
+    {
+        printf("i的值不合法\n");
+        return false;
+    }
+    // LNode *p = L;
+    // int j = 0;
+    // while (p && j < i - 1)
+    // {
+    //     p = p->next;
+    //     j++;
+    // }
+    LNode *p = GetELem(L, i - 1);
+    if (!p)
+    {
+        printf("i的值不合法\n");
+        return false;
+    }
+    if (p->next == NULL)
+    {
+        cout << "该结点之后无其他结点" << endl;
+        return false;
+    }
+    LNode *q = (LNode *)malloc(sizeof(LNode));
+    q = p->next;
+    e = q->data;
+    p->next = q->next;
+    q->next = NULL;
+    free(q);
+    return true;
+}
+
+// 删除指定结点p
+bool DeleteNode(LNode *p)
+{
+    if (!p)
+    {
+        cout << "该指针为空指针" << endl;
+        return false;
+    }
+    if (!p->next)
+    {
+        cout << "此时该结点为单链表的最后一个结点，当前方法无法删除该结点" << endl;
+        return false;
+    }
+    LNode *q = (LNode *)malloc(sizeof(LNode));
+    if (!q)
+    {
+        cout << "内存分配失败" << endl;
+        return false;
+    }
+    q = p->next;
+    p->data = q->data;
+    p->next = q->next;
+    q = NULL;
+    free(q);
+    return true;
+}
+
+// 查找 -- 按位查找
+LNode *GetELem(LinkList L, int i)
+{
+    if (i == 0)
+        return L;
+    if (i < 1)
+    {
+        cout << "查找的位置不合法" << endl;
+        return NULL;
+    }
+    LNode *p = L;
+    int j = 0;
+    while (p && j < i)
+    {
+        p = p->next;
+        j++;
+    }
+    return p;
+} // 时间复杂度O(n)
+
+// 查找 -- 按值查找
+LNode *LocateELem(LinkList L, ElemType e)
+{
+    LNode *p = L->next;
+    while (p && p->data != e)
+    {
+        p = p->next;
+    }
+    return p;
+} // 时间复杂度O(n)
+
+// 求表的长度
+int Length(LinkList L)
+{
+    int len = 0;
+    LNode *p = L;
+    while (p->next != NULL)
+    {
+        p = p->next;
+        len++;
+    }
+    return len;
+} // 时间复杂度O(n)
+
+// 单链表的建立 -- 尾插法
+LinkList List_TailInsert(LinkList &L)
+{
+    LNode *r = L;
+    ElemType e;
+    cin >> e;
+    while (e != 9999)
+    {
+        // LNode *s = (LNode *)malloc(sizeof(LNode));
+        // s->data = e;
+        // s->next = r->next;
+        // r->next = s;
+        // r = r->next;
+        InsertNextLNode(r, e);
+        r = r->next;
+        cin >> e;
+    }
+    return L;
+}
+
+// 单链表的建立 -- 头插法 -- 重要应用！！！链表的逆置
+LinkList List_HeadInsert(LinkList &L)
+{
+    LNode *s;
+    ElemType e;
+    cin >> e;
+    while (e != 9999)
+    {
+        // s = (LNode *)malloc(sizeof(LNode));
+        // s->data = e;
+        // s->next = L->next;
+        // L->next = s;
+        InsertNextLNode(L, e);
+        cin >> e;
+    }
+    return L;
+}
+
+// 逆置单链表 -- 通过头插法逆置
+LinkList ReverseList(LinkList L)
+{
+    LinkList newL = (LinkList)malloc(sizeof(LNode));
+    newL->next = NULL;
+    LNode *p = L->next;
+    while (p)
+    {
+        LNode *q = (LNode *)malloc(sizeof(LNode));
+        q->data = p->data;
+        q->next = newL->next;
+        newL->next = q;
+        p = p->next;
+    }
+    return newL;
+}
+
+// 逆置单链表 -- 原地逆序
+LinkList ReverseList_self(LinkList &L)
+{
+    LNode *p = (LNode *)malloc(sizeof(LNode));
+    p = L->next;
+    if (p->next == NULL)
+        return L;
+
+    LNode *s = (LNode *)malloc(sizeof(LNode));
+    s = p->next;
+    while (s)
+    {
+        if (!s)
+            return L;
+        p->next = s->next;
+        s->next = L->next;
+        L->next = s;
+        s = p->next;
+    }
+    return L;
+}
+
+// 打印
+void PrintInfo(LinkList L)
+{
+    LNode *p = (LNode *)malloc(sizeof(LNode));
+    p = L->next;
+    while (p)
+    {
+        cout << p->data << " ";
+        p = p->next;
+    }
+    cout << endl;
+    p = NULL;
+    free(p);
+}
+
+// ----------------------- 双链表 -----------------------
+
+// 初始化一个双链表
+bool InitDLinkList(DLinkList &L)
+{
+    L = (DLinkList)malloc(sizeof(DNode));
+    if (!L)
+        return false;
+    L->prior = NULL;
+    L->next = NULL;
+    return true;
+}
+
+// 插入
+bool InsertNextDNode(DNode *p, DNode *s)
+{
+    if (!p || !s) // 非法参数
+        return false;
+    s->next = p->next;
+    if (p->next != NULL) // 若p结点有后继结点
+        p->next->prior = s;
+    s->prior = p;
+    p->next = s;
+    return true;
+}
+
+// 在某个结点之前插入新的结点 -- 前插
+bool InsertPriorDNode(DNode *p, DNode *s)
+{
+    if (!p || !s || p->prior == NULL) // 非法参数
+        return false;
+    s->next = p;
+    p->prior->next = s;
+    s->prior = p->prior;
+    p->prior = s;
+    return true;
+    // 也可以找到 p 的前驱结点进行后插操作
+}
+
+// 删除 p 结点的后继结点
+bool DeleteDNode(DLinkList &L, DNode *p, ElemType &e)
+{
+    if (!p || p->next == NULL)
+        return false;
+    DNode *q = (DNode *)malloc(sizeof(DNode));
+    q = p->next;
+    e = q->data;
+    p->next = q->next;
+    if (q->next != NULL)
+    {
+        q->next->prior = p;
+        q->next = NULL;
+    }
+    q->prior = NULL;
+    free(q);
+    return true;
+}
+
+// 打印
+bool PrintDLinkList(DLinkList L)
+{
+    if (L->next == NULL)
+        return false;
+    DNode *p = (DNode *)malloc(sizeof(DNode));
+    if (!p)
+        return false;
+    p = L->next;
+    while (p)
+    {
+        cout << p->data << " ";
+        p = p->next;
+    }
+    free(p);
+    return true;
+}
+
+// ----------------------- 循环链表 -----------------------
+// 初始化一个空的循环单链表
+bool InitCircularList(LinkList &L)
+{
+    L = (LinkList)malloc(sizeof(LNode));
+    if (!L) // 内存不足，分配失败
+        return false;
+    L->next = L; // 头结点next指向头结点
+    return true;
+}
+
+// 判断循环单链表是否为空
+bool EmptyCircularList(LinkList L)
+{
+    if (L->next == L)
+        return true;
+    else
+        return false;
+}
+
+// 初始化一个空的循环双链表
+bool InitCircularDList(DLinkList &L)
+{
+    L = (DLinkList)malloc(sizeof(DNode));
+    if (!L) // 内存不足，分配失败
+        return false;
+    L->next = L;  // 头结点的 next 指向头结点
+    L->prior = L; // 头结点的 piror 指向头结点
+    return true;
+}
+
+// 判断循环双链表是否为空
+bool EmptyCircularDList(DLinkList L)
+{
+    if (L->next == L)
+        return true;
+    else
+        return false;
+}
+
+// 循环双链表的插入
+bool InsertCircularDList(DNode *p, DNode *s)
+{
+    if (!p || !s)
+        return false;
+    s->next = p->next;
+    p->next->prior = s;
+    s->prior = p;
+    p->next = s;
+    return true;
+}
+
+// 循环双链表的删除
+bool DeleteCircularDList(DLinkList &L, DNode *p)
+{
+    if (!p || p->next == L)
+        return false;
+    DNode *q = (DNode *)malloc(sizeof(DNode));
+    if (!q) // 内存分配失败
+        return false;
+    q = p->next;
+    p->next = q->next;
+    q->next->prior = p;
+    q->next = NULL;
+    q->prior = NULL;
+    return true;
+}
+
+// ----------------------- 静态链表 -----------------------
+// 初始化静态链表
+bool InitSLinkList(SLinkList &SL)
+{
+    SL[0].data = 9999;
+    SL[0].next = -1;
+    int i = 0;
+    for (i = 1; i < 10; i++)
+        SL[i].next = 0;
+    return true;
+}
+
+// 查找
+bool SearchElem(SLinkList SL, ElemType e)
+{
+    int i = 0;
+    while (SL[i].next != -1)
+    {
+        i = SL[i].next;
+        if (SL[i].data == e)
+            return true;
+    }
+    return false;
+}
+
+// 插入位序为 i 的结点
+bool InsertSLinkList(SLinkList &SL, ElemType e)
+{
+    int index = 0;
+    // index 用于记录插入元素的位置
+    int loc = 0;
+    // loc 用来记录位序为 i-1的结点(即 next的值为 -1 的结点)
+    int i = 0;
+    while (SL[i].next != -1)
+    {
+        i = SL[i].next;
+    }
+    loc = i; // 找到next值为-1的结点(即表尾)
+    i = 0;
+    while (i < 10 && SL[i].next != 0)
+    {
+        i++;
+    }
+    if (i >= 0 && i < 10)
+    {
+        index = i; // 找到表中空闲位置
+        SL[index].data = e;
+        // 修改next值
+        SL[index].next = SL[loc].next;
+        SL[loc].next = index;
+    }
+    else
+    {
+        cout << "链表已满" << endl;
+    }
+    return true;
+}
+
+// 删除某个结点
+bool DeleteSNode(SLinkList &SL, ElemType e)
+{
+    int i = 0;
+    int j = 0;
+    while (SL[i].next != -1)
+    {
+        j = i;
+        i = SL[i].next;
+        if(e == SL[i].data)
+        {
+            SL[j].next = SL[i].next;
+            SL[i].next = -2;
+            return true;
+        }
+    }
+    cout << "改值不存在" << endl;
+    return false;
+}
+
+// 设置链表的值
+bool SetELem(SLinkList &SL, int i, ElemType e, int ptr)
+{
+    if (i < 0 || i >= 10)
+    {
+        cout << "位置不合法" << endl;
+        return false;
+    }
+    SL[i].data = e;
+    SL[i].next = ptr;
+    return true;
+}
+
+// 打印
+void PrintSLinkList(SLinkList SL)
+{
+    int i = 0;
+    while (SL[i].next != -1)
+    {
+        i = SL[i].next;
+        cout << SL[i].data << " ";
+    }
+    cout << endl;
+}
+
+// ---------------------------- Main.cpp ----------------------------
+#include "./header/LinkList.h"
+
+// 单链表
+// int main()
+// {
+//     LinkList L;
+//     InitList(L);
+//     List_TailInsert(L);
+//     cout << "逆置前:";
+//     PrintInfo(L);
+//     // List_HeadInsert(L);
+//     // LinkList reserveL = ReverseList(L);
+//     LinkList reserveL = ReverseList_self(L);
+//     cout<<"逆置后:";
+//     PrintInfo(reserveL);
+//     return 0;
+// }
+
+// 双链表
+
+// 静态链表
+// int main()
+// {
+//     SLinkList SL;
+//     InitSLinkList(SL);
+//     SetELem(SL,0,0,2);
+//     SetELem(SL,1,1,6);
+//     SetELem(SL,2,2,1);
+//     SetELem(SL,3,3,-1);
+//     SetELem(SL,6,4,3);
+//     PrintSLinkList(SL);
+//     InsertSLinkList(SL,5);
+//     PrintSLinkList(SL);
+//     DeleteSNode(SL,4);
+//     PrintSLinkList(SL);
+//     return 0;
+// }
