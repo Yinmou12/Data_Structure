@@ -1,0 +1,351 @@
+// ---------------------------- String.h ----------------------------
+#ifndef __STRING_H__
+#define __STRING_H__
+
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+
+// ----------------- 串的存储结构 ----------------
+// ------------ 顺序存储 ------------
+#define MAXLEN 255
+// 静态数组实现 (定长顺序存储)
+typedef struct SString
+{
+    char data[MAXLEN]; // 每个分量存储一个字符
+    int length;        // 串的实际长度
+} SString;
+// 赋值
+void StrAssign(SString &T, char *s);
+// 复制
+void StrCopy(SString &T, SString S);
+// 判空
+int StrEmpty(SString S);
+// 比较两个串
+int StrCompare(SString S, SString T);
+// 求串的长度
+int StrLength(SString S);
+// 求子串
+int SubString(SString &Sub, SString S, int pos, int len);
+// 串联接
+int Concat(SString &T, SString S1, SString S2);
+// 定位操作
+int Index(SString S, SString T);
+
+//
+
+// 动态数组实现 (堆分配存储)
+typedef struct DString
+{
+    char *data; // 按串长分配存储区，data指向串的基地址
+    int length; // 串的长度
+} DString;
+
+// ------------ 链式存储 ------------
+// 存储密度低
+// 解决办法：可以让每个结点存储多个字符
+#define COUNT 4
+typedef struct StringNode
+{
+    char data[COUNT];
+    struct StringNode *next;
+} StringNode, *String;
+
+// ----------------- 朴素模式匹配算法 ----------------
+// 主串S --> 长度为 n,模式串T --> 长度为m
+// 最多对比 n-m+1 个子串
+int MatchIndex(SString S, SString T);
+
+// ----------------- KMP算法 ----------------
+void GetNextArr(SString T, int **next);
+void GetNextValArr(SString T, int *next, int **nextval);
+int Index_KMP(SString S, SString T, int next[]);
+void Test_GetNextArr();
+void Test_GetNextValArr();
+void Test_KMP();
+
+#endif
+
+// ---------------------------- string.cpp ----------------------------
+#include "./header/String.h"
+
+// 赋值
+void StrAssign(SString &T, char *s)
+{
+    T.length = 0;
+    int i = 0;
+    while (T.data[i + 1] = *(s + i))
+    {
+        i++;
+        T.length++;
+    }
+}
+
+// 复制
+void StrCopy(SString &T, SString S)
+{
+    int i = 0;
+    while (i < S.length)
+    {
+        i++;
+        T.data[i] = S.data[i];
+    }
+    T.length = S.length;
+}
+
+// 判空
+int StrEmpty(SString S)
+{
+    if (S.length == 0)
+        return 1;
+    else
+        return 0;
+}
+
+// 比较两个串
+int StrCompare(SString S, SString T)
+{
+    // 若 S>T 返回 大于0 的值
+    // 若 S=T 返回 等于0 的值
+    // 若 S<T 返回 小于0 的值
+    int i = 0;
+    while (i < S.length && i < T.length)
+    {
+        i++;
+        if (S.data[i] != T.data[i])
+            return S.data[i] = T.data[i];
+    }
+    // 扫描过的字符都相同，则长度更长的串更大
+    return S.length - T.length;
+}
+
+// 求子串
+int SubString(SString &Sub, SString S, int pos, int len)
+{
+    // 子串越界
+    if (pos + len - 1 > S.length)
+        return 0;
+    int i = 0;
+    for (i = pos; i < pos + len; i++)
+        Sub.data[i - pos + 1] = S.data[i];
+    Sub.length = len;
+    return 1;
+}
+
+// 求串的长度
+int StrLength(SString S)
+{
+    return S.length;
+}
+
+// 串联接
+int Concat(SString &T, SString S1, SString S2)
+{
+    // 由 T 返回又 S1 和 S2 联接而成的新串
+    if (S1.length == 0)
+    {
+        StrCopy(T, S2);
+        return 1;
+    }
+    StrCopy(T, S1);
+    if (S2.length == 0)
+        return 1;
+    int loc = T.length + 1;
+    int i = 0;
+    while (i < S2.length)
+    {
+        i++;
+        T.data[loc++] = S2.data[i];
+        if (loc == MAXLEN)
+            return 0;
+    }
+    return 1;
+}
+
+// 定位操作
+int Index(SString S, SString T)
+{
+    // 若主串s中含有与串T相同的子串
+    // 则返回它在主串S中第一次出现的位置
+    if (S.length == 0 || T.length == 0)
+        return 0;
+    int i = 1;
+    int n = StrLength(S);
+    int m = StrLength(T);
+    SString sub; // 用于暂存子串
+    while (i <= n - m + 1)
+    {
+        SubString(sub, S, i, m);
+        if (StrCompare(sub, T) != 0)
+            i++;
+        else
+            return i;
+    }
+    return 0; // S 中没有与 T 相同的子串
+}
+
+// ----------------- 朴素模式匹配算法 ----------------
+// 主串S --> 长度为 n,模式串T --> 长度为m
+// 最多对比 n-m+1 个子串
+int MatchIndex(SString S, SString T)
+{
+    int i = 1, j = 1;
+    while (i <= S.length && j <= T.length)
+    {
+        if (S.data[i] == T.data[j])
+        {
+            i++;
+            j++;
+        }
+        else
+        {
+            i = i - j + 2;
+            j = 1;
+        }
+    }
+    if (j > T.length)
+        return i - T.length;
+    else
+        return 0;
+} // 最坏的时间复杂度O(nm)
+
+// ----------------- KMP算法 ----------------
+void GetNextArr(SString T, int **next)
+{
+    int i = 1;
+    int j = 0;
+    (*next)[0] = -1;
+    while (i <= T.length)
+    {
+        if (i == 1)
+        {
+            (*next)[i] = j;
+            i++;
+            j++;
+        }
+        else if (i == 2)
+        {
+            (*next)[i] = j;
+            i++;
+        }
+        else
+        {
+            int temp = (*next)[i - 1];
+            while (temp != 0 && T.data[i - 1] != T.data[temp])
+                temp = (*next)[temp];
+            (*next)[i] = ++temp;
+            i++;
+        }
+    }
+}
+
+void GetNextValArr(SString T, int *next, int **nextval)
+{
+    int i = 1;
+    (*nextval)[0] = -1;
+    for (; i <= T.length; i++)
+    {
+        if (i == 1)
+        {
+            (*nextval)[i] = 0;
+        }
+        else
+        {
+            int temp = next[i];
+            while (temp != 0 && T.data[i] == T.data[temp])
+                temp = next[temp];
+            if (temp == 0)
+                (*nextval)[i] = 0;
+            else
+            {
+                (*nextval)[i] = next[i];
+            }
+        }
+    }
+}
+
+int Index_KMP(SString S, SString T, int next[])
+{
+    int i = 1, j = 1;
+    while (i <= S.length && j <= T.length)
+    {
+        if (j == 0 || S.data[i] == T.data[j])
+        {
+            i++;
+            j++;
+        }
+        else
+            j = next[j]; // 移动模式串指针
+    }
+    if (j > T.length)
+        return i - T.length; // 匹配成功
+    else
+        return 0;
+}
+
+void Test_GetNextArr()
+{
+    SString T;
+    char t[10] = "aaaab";
+    StrAssign(T, t);
+    int *next = new int;
+    GetNextArr(T, &next);
+    int i = 0;
+    while (i <= T.length)
+    {
+        cout << next[i] << " ";
+        i++;
+        if (i == T.length)
+            cout << endl;
+    }
+}
+
+void Test_GetNextValArr()
+{
+    SString T;
+    char t[10] = "aaaab";
+    StrAssign(T, t);
+    int *next = new int;
+    GetNextArr(T, &next);
+    int *nextval = new int;
+    GetNextValArr(T, next, &nextval);
+    int i = 0;
+    cout << "   next[]:>";
+    for (i = 0; i <= T.length; i++)
+    {
+        cout << next[i] << " ";
+        if (i == T.length)
+            cout << endl;
+    }
+    cout << "nextval[]:>";
+    for (i = 0; i <= T.length; i++)
+    {
+        cout << nextval[i] << " ";
+        if (i == T.length)
+            cout << endl;
+    }
+}
+
+void Test_KMP()
+{
+    SString S, T;
+    char s[10] = "abababaa";
+    StrAssign(S, s);
+    char t[10] = "aaaab";
+    StrAssign(T, t);
+    int *next = new int;
+    GetNextArr(T, &next);
+    cout << Index_KMP(S, T, next) << endl;
+}
+
+// ---------------------------- Main.cpp ----------------------------
+#include "./header/String.h"
+
+int main()
+{
+    // Test_GetNextArr();
+    Test_GetNextValArr();
+    // Test_KMP();
+    return 0;
+}
