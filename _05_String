@@ -213,55 +213,38 @@ int MatchIndex(SString S, SString T)
 // ----------------- KMP算法 ----------------
 void GetNextArr(SString T, int **next)
 {
-    int i = 1;
+    int i = 0;
     int j = 0;
     (*next)[0] = -1;
-    while (i <= T.length)
+    (*next)[1] = 0;
+    (*next)[2] = 1;
+    for (i = 3; i <= T.length; i++)
     {
-        if (i == 1)
-        {
-            (*next)[i] = j;
-            i++;
-            j++;
-        }
-        else if (i == 2)
-        {
-            (*next)[i] = j;
-            i++;
-        }
+        if (T.data[i - 1] == T.data[(*next)[i - 1]])
+            (*next)[i] = (*next)[i - 1] + 1;
         else
-        {
-            int temp = (*next)[i - 1];
-            while (temp != 0 && T.data[i - 1] != T.data[temp])
-                temp = (*next)[temp];
-            (*next)[i] = ++temp;
-            i++;
-        }
+            (*next)[i] = (*next)[i - 1];
     }
 }
 
 void GetNextValArr(SString T, int *next, int **nextval)
 {
-    int i = 1;
     (*nextval)[0] = -1;
-    for (; i <= T.length; i++)
+    (*nextval)[1] = 0;
+    int i = 0;
+    // for (i = 2; i <= T.length; i++)
+    // {
+    //     int temp = next[i];
+    //     while (temp != 0 && T.data[i] == T.data[temp])
+    //         temp = next[temp];
+    //     (*nextval)[i] = temp;
+    // }
+    for (i = 2; i <= T.length; i++)
     {
-        if (i == 1)
-        {
-            (*nextval)[i] = 0;
-        }
+        if (T.data[next[i]] == T.data[i])
+            (*nextval)[i] = (*nextval)[next[i]];
         else
-        {
-            int temp = next[i];
-            while (temp != 0 && T.data[i] == T.data[temp])
-                temp = next[temp];
-            if (temp == 0)
-                (*nextval)[i] = 0;
-            else
-            {
-                (*nextval)[i] = next[i];
-            }
-        }
+            (*nextval)[i] = next[i];
     }
 }
 
@@ -338,6 +321,7 @@ void Test_KMP()
     GetNextArr(T, &next);
     cout << Index_KMP(S, T, next) << endl;
 }
+
 
 // ---------------------------- Main.cpp ----------------------------
 #include "./header/String.h"
